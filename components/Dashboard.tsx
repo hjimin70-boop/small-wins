@@ -16,6 +16,39 @@ const Dashboard: React.FC = () => {
   // Random Daily Keyword
   const [dailyKeyword] = useState(() => DAILY_KEYWORDS[Math.floor(Math.random() * DAILY_KEYWORDS.length)]);
 
+  // Load state from localStorage on mount
+  useEffect(() => {
+    try {
+      const savedMissions = localStorage.getItem('smallwins_missions');
+      if (savedMissions) {
+        setMissions(JSON.parse(savedMissions));
+      }
+      
+      const savedSunlight = localStorage.getItem('smallwins_sunlight');
+      if (savedSunlight) {
+        setCollectedSunlight(JSON.parse(savedSunlight));
+      }
+
+      // Check if we need to show Level 2 based on loaded missions
+      if (savedMissions) {
+          const parsedMissions: Mission[] = JSON.parse(savedMissions);
+          const hasLevel2 = parsedMissions.some(m => m.level === 2);
+          if (hasLevel2) setShowLevel2(true);
+      }
+    } catch (e) {
+      console.error("Failed to load local storage", e);
+    }
+  }, []);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('smallwins_missions', JSON.stringify(missions));
+  }, [missions]);
+
+  useEffect(() => {
+    localStorage.setItem('smallwins_sunlight', JSON.stringify(collectedSunlight));
+  }, [collectedSunlight]);
+
   const toggleMission = (id: number) => {
     setMissions(missions.map(m => 
       m.id === id ? { ...m, completed: !m.completed } : m
@@ -23,7 +56,8 @@ const Dashboard: React.FC = () => {
   };
 
   const unlockLevel2 = () => {
-    setMissions([...missions, ...LEVEL_2_MISSIONS]);
+    const newMissions = [...missions, ...LEVEL_2_MISSIONS];
+    setMissions(newMissions);
     setShowLevel2(true);
   };
 
@@ -37,6 +71,7 @@ const Dashboard: React.FC = () => {
 
   const completedCount = missions.filter(m => m.completed).length;
   const level1Completed = missions.filter(m => m.level === 1 && m.completed).length;
+  // Unlock logic: 3 or more level 1 missions completed AND level 2 not yet shown
   const isLevel2Unlocked = level1Completed >= 3 && !showLevel2;
 
   // XP Calculation

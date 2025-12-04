@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import HealingGallery from './components/HealingGallery';
 import StudyGroup from './components/StudyGroup';
@@ -12,6 +12,19 @@ enum Tab {
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.DASHBOARD);
+
+  // Restore active tab
+  useEffect(() => {
+    const savedTab = localStorage.getItem('smallwins_active_tab');
+    if (savedTab && Object.values(Tab).includes(savedTab as Tab)) {
+        setActiveTab(savedTab as Tab);
+    }
+  }, []);
+
+  // Save active tab
+  useEffect(() => {
+    localStorage.setItem('smallwins_active_tab', activeTab);
+  }, [activeTab]);
 
   const renderContent = () => {
     switch (activeTab) {

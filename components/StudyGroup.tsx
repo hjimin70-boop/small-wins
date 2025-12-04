@@ -10,10 +10,35 @@ const StudyGroup: React.FC = () => {
   const [friends, setFriends] = useState<Friend[]>(MOCK_FRIENDS);
   const [fogCleared, setFogCleared] = useState(FOG_CHALLENGE.current);
 
-  // Simulate real-time updates
+  // Load persistence
+  useEffect(() => {
+    try {
+        const savedMinutes = localStorage.getItem('smallwins_global_minutes');
+        if (savedMinutes) setGlobalMinutes(parseInt(savedMinutes));
+        
+        const savedFog = localStorage.getItem('smallwins_fog');
+        if (savedFog) setFogCleared(parseInt(savedFog));
+    } catch(e) {
+        console.error(e);
+    }
+  }, []);
+
+  // Save persistence & Simulate real-time updates
   useEffect(() => {
     const timer = setInterval(() => {
-      setGlobalMinutes(prev => prev + 1);
+      setGlobalMinutes(prev => {
+          const newVal = prev + 1;
+          localStorage.setItem('smallwins_global_minutes', newVal.toString());
+          return newVal;
+      });
+      // Randomly clear fog occasionally
+      if (Math.random() > 0.7) {
+          setFogCleared(prev => {
+              const newVal = Math.min(prev + 5, FOG_CHALLENGE.total);
+              localStorage.setItem('smallwins_fog', newVal.toString());
+              return newVal;
+          });
+      }
     }, 5000);
     return () => clearInterval(timer);
   }, []);

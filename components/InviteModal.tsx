@@ -12,9 +12,16 @@ const InviteModal: React.FC<InviteModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(`https://small-wins.app/invite/${inviteCode}`);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    // Use the current origin (e.g., the Vercel deployment URL)
+    const baseUrl = window.location.origin;
+    const inviteUrl = `${baseUrl}/invite/${inviteCode}`;
+    
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }).catch(err => {
+      console.error('Failed to copy: ', err);
+    });
   };
 
   return (
