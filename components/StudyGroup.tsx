@@ -25,7 +25,7 @@ const StudyGroup: React.FC = () => {
 
   // Save persistence & Simulate real-time updates
   useEffect(() => {
-    const timer = setInterval(() => {
+    const timer = window.setInterval(() => {
       setGlobalMinutes(prev => {
           const newVal = prev + 1;
           localStorage.setItem('smallwins_global_minutes', newVal.toString());

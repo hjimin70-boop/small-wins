@@ -1,5 +1,12 @@
 import { GoogleGenAI } from "@google/genai";
 
+// Ensure TypeScript recognizes process.env for web builds
+declare const process: {
+  env: {
+    API_KEY: string;
+  }
+};
+
 const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
 
 export const getEncouragementMessage = async (moodLabel: string): Promise<string> => {
